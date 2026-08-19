@@ -1,0 +1,5 @@
+/videos/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=86400
+/tools/*
+  Cache-Control: public, max-age=86400

@@ -1,0 +1,49 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { sectionsFor } from '../data/nav';
+
+interface Props {
+  title: string;
+  description?: string;
+  route: string;
+  date?: Date;
+  updated?: Date;
+}
+
+const { title, description, route, date, updated } = Astro.props;
+const crumbs = sectionsFor(route);
+
+const canonical = new URL('/' + route, Astro.site);
+
+// JSON-LD：Article + BreadcrumbList
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: date,
+  dateModified: updated ?? date,
+  mainEntityOfPage: canonical.href,
+  author: { '@type': 'Person', name: 'Self custody' },
+  publisher: { '@type': 'Organization', name: 'Self custody' },
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.route ? { item: new URL(c.route, Astro.site).href } : {}),
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} route={route} ogType="article">
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />
+  <Breadcrumb segments={crumbs} />
+  <slot />
+</BaseLayout>

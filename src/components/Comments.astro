@@ -1,0 +1,9 @@
+---
+// 评论区接口位（当前为占位，不注入任何外部脚本）
+// 上线后二选一接入：
+//  1) Twikoo：<script src="<twikoo-cdn>/twikoo.all.min.js"></script>
+//     然后 twikoo.init({ envId: '<ENV_ID>', el: '#comments' })
+//  2) Cloudflare Workers + D1 自建 HN 式评论区：挂载 /comments.js 到 #comments
+// 二者都只需页面提供 <div id="comments"> 容器。
+---
+<div id="comments" data-comments-slot aria-label="评论区"></div>

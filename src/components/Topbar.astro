@@ -1,0 +1,19 @@
+---
+interface Props {
+  dataPagefindIgnore?: boolean;
+}
+---
+<header class="topbar">
+  <div class="topbar__actions">
+    <button class="topbar__search" id="search-btn" type="button" title="搜索本站">
+      <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="2" />
+        <line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span>搜索</span>
+    </button>
+    <button class="topbar__btn" type="button" title="设置（暂未开放）" aria-label="设置">
+      <img src="/assets/header-icon.svg" alt="" />
+    </button>
+  </div>
+</header>

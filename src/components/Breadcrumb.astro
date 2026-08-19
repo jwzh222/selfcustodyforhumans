@@ -1,0 +1,23 @@
+---
+import type { Crumb } from '../data/nav';
+
+interface Props {
+  segments: Crumb[];
+}
+const { segments } = Astro.props;
+---
+<nav class="breadcrumb" aria-label="面包屑">
+  <ol>
+    {
+      segments.map((s, i) => (
+        <li>
+          {s.route ? (
+            <a href={s.route}>{s.label}</a>
+          ) : (
+            <span aria-current={i === segments.length - 1 ? 'page' : undefined}>{s.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

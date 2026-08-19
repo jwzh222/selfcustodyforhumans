@@ -1,0 +1,112 @@
+---
+import { NAV } from '../data/nav';
+import type { NavSection, NavGroup, NavLeaf } from '../data/nav';
+
+interface Props {
+  route: string; // 当前路由（不带首尾斜杠），用于高亮
+}
+
+const { route } = Astro.props;
+const isActive = (path: string) => route === path || route.startsWith(path + '/');
+
+function sectionClasses(section: NavSection): string {
+  let cls = 'section ';
+  if (section.accent) cls += 'section--accent';
+  else if (section.indented) cls += 'section--plain section--indented';
+  else cls += 'section--plain';
+  if (section.children?.length) cls += ' has-children';
+  if (section.bordered === 'bottom') cls += ' nav-row--border-bottom';
+  else if (section.bordered) cls += ' nav-row--bordered';
+  return cls;
+}
+
+const leafClasses = (mono: boolean, active: boolean) =>
+  'nav-leaf' + (mono ? ' nav-leaf--mono' : '') + (active ? ' is-active' : '');
+---
+
+<a class="sidebar__brand" href="/" title="回到首页">
+  <span class="sidebar__brand-name">Self custody</span>
+  <img class="sidebar__brand-icon" src="/assets/logo-icon.svg" alt="Self custody" />
+</a>
+<nav class="sidebar__nav" id="nav" aria-label="目录导航">
+  {
+    NAV.map((section) => {
+      const hasChildren = !!section.children?.length;
+      return (
+        <div
+          class={sectionClasses(section)}
+          id={`section-${section.id}`}
+          data-section={section.id}
+          data-force-open={isActive(section.id) ? 'true' : undefined}
+        >
+          {hasChildren ? (
+            <>
+              <div
+                class="section-head"
+                role="button"
+                tabindex="0"
+                aria-expanded="true"
+                aria-controls={`${section.id}-children`}
+              >
+                <img class="chev" src={section.accent ? '/assets/chevron.svg' : '/assets/chevron-2.svg'} alt="" aria-hidden="true" />
+                {section.icon && (
+                  <img
+                    class={'section-head__icon' + (section.iconClass ? ` section-head__icon--${section.iconClass}` : '')}
+                    src={section.icon}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                )}
+                <span class="section-head__label">{section.label}</span>
+              </div>
+              <div class="section-children" id={`${section.id}-children`}>
+                {section.children!.map((sub) => {
+                  if ('children' in sub && sub.children) {
+                    const group = sub as NavGroup;
+                    return (
+                      <>
+                        <div class="subsection">{group.label}</div>
+                        <div class="subsection-children">
+                          {group.children.map((leaf: NavLeaf) => (
+                            <a
+                              class={leafClasses(!!leaf.mono, route === `${section.id}/${group.id}/${leaf.id}`)}
+                              href={`/${section.id}/${group.id}/${leaf.id}`}
+                            >
+                              {leaf.label}
+                            </a>
+                          ))}
+                        </div>
+                      </>
+                    );
+                  }
+                  const leaf = sub as NavLeaf;
+                  return (
+                    <a
+                      class={leafClasses(!!leaf.mono, route === `${section.id}/${leaf.id}`)}
+                      href={`/${section.id}/${leaf.id}`}
+                    >
+                      {leaf.label}
+                    </a>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <a class={'section-head' + (route === section.id ? ' is-active' : '')} data-route={section.id} href={`/${section.id}`}>
+              <img class="chev" src="/assets/chevron-2.svg" alt="" aria-hidden="true" />
+              {section.icon && (
+                <img
+                  class={'section-head__icon' + (section.iconClass ? ` section-head__icon--${section.iconClass}` : '')}
+                  src={section.icon}
+                  alt=""
+                  aria-hidden="true"
+                />
+              )}
+              <span class="section-head__label">{section.label}</span>
+            </a>
+          )}
+        </div>
+      );
+    })
+  }
+</nav>

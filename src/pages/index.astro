@@ -1,0 +1,66 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { NAV } from '../data/nav';
+import type { NavSection, NavGroup, NavLeaf } from '../data/nav';
+
+const home = await getEntry('docs', 'home');
+const { Content } = await render(home);
+
+/** 每个顶级栏目的落地页（无独立页面时取第一个子叶） */
+function landingRoute(section: NavSection): string {
+  const children = section.children;
+  if (children && children.length) {
+    const first = children[0];
+    if ('children' in first && first.children?.length) {
+      const group = first as NavGroup;
+      return `/${section.id}/${group.id}/${group.children[0].id}`;
+    }
+    return `/${section.id}/${(first as NavLeaf).id}`;
+  }
+  return `/${section.id}`;
+}
+
+const sections = NAV.map((s) => ({
+  id: s.id,
+  label: s.label,
+  route: landingRoute(s),
+  icon: s.icon,
+  iconClass: s.iconClass,
+}));
+---
+
+<BaseLayout isHome>
+  <script is:inline>
+    // 旧 hash 链接迁移：/#/for-mom/... → /for-mom/...
+    (function () {
+      var m = location.hash.match(/^#\/(.*)$/);
+      if (m && m[1]) location.replace('/' + m[1]);
+    })();
+  </script>
+
+  <article class="md home-intro">
+    <Content />
+  </article>
+
+  <section class="quick-links" aria-label="从这里开始">
+    <h2 class="quick-links__title">从这里开始</h2>
+    <div class="quick-links__grid">
+      {
+        sections.map((s) => (
+          <a class="quick-links__card" href={s.route}>
+            {s.icon && (
+              <img
+                class={'quick-links__icon' + (s.iconClass ? ` quick-links__icon--${s.iconClass}` : '')}
+                src={s.icon}
+                alt=""
+                aria-hidden="true"
+              />
+            )}
+            <span class="quick-links__label">{s.label}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

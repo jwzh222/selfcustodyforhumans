@@ -1,0 +1,72 @@
+---
+import '../styles/fonts.css';
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+import Topbar from '../components/Topbar.astro';
+import SearchModal from '../components/SearchModal.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  route?: string; // 当前路由（不带首尾斜杠），用于侧边栏高亮
+  isHome?: boolean;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  route = '',
+  isHome = false,
+  ogType = isHome ? 'website' : 'article',
+} = Astro.props;
+
+const siteTitle = 'Self custody · 简单安全的比特币自托管';
+const siteName = 'Self custody';
+const pageTitle = title ? `${title} · Self custody` : siteTitle;
+const desc = description ?? '面向非技术人群的比特币自托管指南：bip39 + passphrase，简单又安全。';
+const canonical = new URL(isHome ? '/' : '/' + route, Astro.site);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content={siteName} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body data-route={route || undefined}>
+    <ReadingProgress />
+    <aside class="sidebar" aria-label="目录导航" data-pagefind-ignore>
+      <Sidebar route={route} />
+    </aside>
+    <main class="main">
+      <Topbar data-pagefind-ignore />
+      <div class="content" id="content">
+        <div class="container">
+          <slot />
+        </div>
+        <footer class="footer" data-pagefind-ignore>
+          <div class="footer__inner">
+            <span>Self custody · 简单又安全的比特币自托管</span>
+          </div>
+        </footer>
+      </div>
+    </main>
+    <SearchModal />
+    <script src="../scripts/sidebar.ts"></script>
+    <script src="../scripts/reading-progress.ts"></script>
+    <script src="../scripts/search.ts"></script>
+  </body>
+</html>
