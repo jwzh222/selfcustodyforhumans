@@ -1,13 +1,20 @@
 /**
  * 目录导航数据（真源）与辅助函数
  * 结构：
- *   for mom（强调区块）
- *     1. 创建钱包（助记词+passphrase）→ 随机数 / 什么是好的passphrase
- *     2. 保存助记词 → 纸 / 铁片
- *     3. 使用钱包 → 旧手机安装electrum
+ *   for mom（强调区块，三节无编号）
+ *     创建钱包（主页 + 两小节）
+ *       1. 助记词
+ *         1. 助记词是高风险环节
+ *         2. 投骰子很快
+ *       2. passphrase
+ *     备份钱包 → 纸 / 铁片
+ *     使用钱包 → 旧手机安装electrum
  *   for 高级用户
  *   附录 → 1. abc / 2. cdb
  *   Tools
+ *
+ * 分组（NavGroup）可嵌套：children 既可以是叶子也可以是子分组，
+ * 深度不限；有 href 的分组头即链接（点击打开对应 md 主页）。
  */
 
 export interface NavLeaf {
@@ -19,7 +26,8 @@ export interface NavLeaf {
 export interface NavGroup {
   id: string;
   label: string;
-  children: NavLeaf[];
+  href?: string;                            // 分组头即链接（点击打开对应 md 主页）
+  children: (NavGroup | NavLeaf)[];         // 支持嵌套分组
 }
 
 export interface NavSection {
@@ -43,15 +51,24 @@ export const NAV: NavSection[] = [
     children: [
       {
         id: 'create-wallet',
-        label: '1. 创建钱包（助记词+passphrase）',
+        label: '创建钱包',
+        href: '/for-mom/create-wallet/create-wallet',
         children: [
-          { id: 'random', label: '随机数' },
-          { id: 'good-passphrase', label: '什么是好的passphrase', mono: true },
+          {
+            id: 'mnemonic',
+            label: '1. 助记词',
+            children: [
+              { id: 'mnemonic-risk', label: '1. 助记词是高风险环节' },
+              { id: 'dice-fast', label: '2. 投骰子很快' },
+            ],
+          },
+          { id: 'good-passphrase', label: '2. passphrase' },
         ],
       },
       {
-        id: 'save-seed',
-        label: '2. 保存助记词',
+        id: 'backup-wallet',
+        label: '备份钱包',
+        href: '/for-mom/backup-wallet/backup-wallet',
         children: [
           { id: 'paper', label: '纸' },
           { id: 'metal', label: '铁片' },
@@ -59,7 +76,8 @@ export const NAV: NavSection[] = [
       },
       {
         id: 'use-wallet',
-        label: '3. 使用钱包',
+        label: '使用钱包',
+        href: '/for-mom/use-wallet/use-wallet',
         children: [
           { id: 'old-phone-electrum', label: '旧手机安装electrum', mono: true },
         ],
@@ -95,7 +113,7 @@ export const NAV: NavSection[] = [
   },
 ];
 
-/** 拍平的叶子（含顶级独立页面），顺序即线性阅读顺序 */
+/** 拍平的叶子（含分组主页），顺序即线性阅读顺序 */
 export interface FlatEntry {
   route: string;
   label: string;
@@ -103,30 +121,43 @@ export interface FlatEntry {
   sectionId: string;
 }
 
+/** 递归收集所有可访问节点：分组主页（有 href 时）+ 叶子 */
+function collect(
+  sectionId: string,
+  prefix: string,
+  nodes: (NavGroup | NavLeaf)[]
+): FlatEntry[] {
+  const out: FlatEntry[] = [];
+  for (const node of nodes) {
+    if ('children' in node && node.children) {
+      const grp = node as NavGroup;
+      if (grp.href) {
+        out.push({
+          route: grp.href.replace(/^\//, ''),
+          label: grp.label,
+          mono: false,
+          sectionId,
+        });
+      }
+      out.push(...collect(sectionId, `${prefix}/${grp.id}`, grp.children));
+    } else {
+      const leaf = node as NavLeaf;
+      out.push({
+        route: `${prefix}/${leaf.id}`,
+        label: leaf.label,
+        mono: !!leaf.mono,
+        sectionId,
+      });
+    }
+  }
+  return out;
+}
+
 export const FLAT: FlatEntry[] = (() => {
   const flat: FlatEntry[] = [];
   for (const section of NAV) {
     if (section.children && section.children.length) {
-      for (const group of section.children) {
-        if ('children' in group && group.children) {
-          for (const leaf of group.children) {
-            flat.push({
-              route: `${section.id}/${group.id}/${leaf.id}`,
-              label: leaf.label,
-              mono: !!leaf.mono,
-              sectionId: section.id,
-            });
-          }
-        } else {
-          const leaf = group as NavLeaf;
-          flat.push({
-            route: `${section.id}/${leaf.id}`,
-            label: leaf.label,
-            mono: !!leaf.mono,
-            sectionId: section.id,
-          });
-        }
-      }
+      flat.push(...collect(section.id, section.id, section.children));
     } else {
       // 无子项的顶级项（for 高级用户 / Tools）自身即页面
       flat.push({
@@ -146,7 +177,7 @@ export function labelFor(route: string): string | undefined {
   return byRoute.get(route)?.label;
 }
 
-/** 面包屑分段：顶级章节 → 分组 → 当前页 */
+/** 面包屑分段：顶级章节 → 分组 → … → 当前页（沿路由逐层下行） */
 export interface Crumb {
   label: string;
   route?: string; // 可点击时给出（仅当该段是页面）
@@ -160,17 +191,27 @@ export function sectionsFor(route: string): Crumb[] {
     if (label) crumbs.push({ label, route: '/' + route });
     return crumbs;
   }
-  // 顶部章节名（for-mom / appendix）
   const section = NAV.find((s) => s.id === parts[0]);
-  if (section) crumbs.push({ label: section.label });
-  // 分组名（1.创建钱包 等）
-  const group = section?.children?.find(
-    (g) => 'children' in g && g.id === parts[1]
-  ) as NavGroup | undefined;
-  if (group) crumbs.push({ label: group.label });
-  // 当前页
-  const entry = byRoute.get(route);
-  if (entry) crumbs.push({ label: entry.label, route: '/' + route });
+  if (!section) return crumbs;
+  crumbs.push({ label: section.label });
+
+  let nodes = section.children;
+  let acc = parts[0];
+  for (let i = 1; i < parts.length; i++) {
+    const node = nodes?.find((n) => n.id === parts[i]);
+    if (!node) break;
+    acc += '/' + parts[i];
+    if ('children' in node && node.children) {
+      const grp = node as NavGroup;
+      // 分组主页：当前页正是该主页时，末级不重复且不可点
+      const isGroupMain = !!grp.href && grp.href.replace(/^\//, '') === route;
+      crumbs.push({ label: grp.label, route: isGroupMain ? undefined : grp.href });
+      nodes = node.children;
+    } else {
+      crumbs.push({ label: node.label, route: '/' + acc });
+      break;
+    }
+  }
   return crumbs;
 }
 

@@ -193,6 +193,21 @@ a { color: inherit; }
   color: var(--text-brown);
   user-select: none;
 }
+/* 可点击的小节标题（for mom 三节：点击打开对应 md） */
+.subsection--link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .15s ease;
+}
+.subsection--link:hover { color: var(--accent); }
+.subsection.is-active {
+  color: var(--accent);
+  font-weight: 700;
+}
+/* 二级嵌套分组（如 助记词）与其子节之间留白 */
+.subsection-nested { margin-top: 4px; }
+.subsection-nested > .subsection { padding-top: 2px; padding-bottom: 2px; }
 
 /* ---- 三级：叶子链接 ---- */
 .subsection-children {

@@ -63,18 +63,65 @@ const leafClasses = (mono: boolean, active: boolean) =>
                 {section.children!.map((sub) => {
                   if ('children' in sub && sub.children) {
                     const group = sub as NavGroup;
+                    const groupRoute = group.href?.replace(/^\//, '');
+                    const groupActive = groupRoute
+                      ? route === groupRoute || route.startsWith(`${section.id}/${group.id}/`)
+                      : route.startsWith(`${section.id}/${group.id}/`);
                     return (
                       <>
-                        <div class="subsection">{group.label}</div>
+                        {group.href ? (
+                          <a
+                            class={'subsection subsection--link' + (groupActive ? ' is-active' : '')}
+                            href={group.href}
+                          >
+                            {group.label}
+                          </a>
+                        ) : (
+                          <div class={'subsection' + (groupActive ? ' is-active' : '')}>{group.label}</div>
+                        )}
                         <div class="subsection-children">
-                          {group.children.map((leaf: NavLeaf) => (
-                            <a
-                              class={leafClasses(!!leaf.mono, route === `${section.id}/${group.id}/${leaf.id}`)}
-                              href={`/${section.id}/${group.id}/${leaf.id}`}
-                            >
-                              {leaf.label}
-                            </a>
-                          ))}
+                          {group.children.map((child) => {
+                            // 二级嵌套分组（如 助记词 下再分两子节）
+                            if ('children' in child && child.children) {
+                              const sub2 = child as NavGroup;
+                              const sub2Route = sub2.href?.replace(/^\//, '');
+                              const sub2Active = sub2Route
+                                ? route === sub2Route || route.startsWith(`${section.id}/${group.id}/${sub2.id}/`)
+                                : route.startsWith(`${section.id}/${group.id}/${sub2.id}/`);
+                              return (
+                                <div class="subsection-nested">
+                                  {sub2.href ? (
+                                    <a
+                                      class={'subsection subsection--link' + (sub2Active ? ' is-active' : '')}
+                                      href={sub2.href}
+                                    >
+                                      {sub2.label}
+                                    </a>
+                                  ) : (
+                                    <div class={'subsection' + (sub2Active ? ' is-active' : '')}>{sub2.label}</div>
+                                  )}
+                                  <div class="subsection-children">
+                                    {sub2.children.map((leaf: NavLeaf) => {
+                                      const leafRoute = `${section.id}/${group.id}/${sub2.id}/${leaf.id}`;
+                                      return (
+                                        <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`}>
+                                          {leaf.label}
+                                        </a>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            // 直接叶子（如 passphrase）
+                            const leaf = child as NavLeaf;
+                            const leafRoute = `${section.id}/${group.id}/${leaf.id}`;
+                            return (
+                              <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`}>
+                                {leaf.label}
+                              </a>
+                            );
+                          })}
                         </div>
                       </>
                     );
