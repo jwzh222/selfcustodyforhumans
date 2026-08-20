@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // 部署域名（sitemap / RSS / canonical / OG 都依赖它）
-  site: 'https://wecanselfcustody.com',
+  site: 'https://selfcustodyforhumans.com',
   output: 'static',
   // 干净 URL：/for-mom/create-wallet/random（无尾斜杠）
   trailingSlash: 'never',

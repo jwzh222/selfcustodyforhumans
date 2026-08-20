@@ -12,3 +12,6 @@ Thumbs.db
 
 # 本机 Claude 本地配置（不随仓库分发）
 .claude/settings.local.json
+
+# WorkBuddy 项目记忆（内部笔记，不随仓库分发）
+.workbuddy/

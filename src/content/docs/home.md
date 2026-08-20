@@ -1,6 +1,6 @@
 ---
-title: 首页
-description: 面向非技术人群的比特币自托管指南：bip39 助记词 + passphrase，简单又安全。
+title: Self Custody for Humans
+description: 面向非技术人群的比特币自托管指南：bip39 助记词 + passphrase，简单又安全。A practical guide to Bitcoin self-custody for non-geeks.
 date: 2026-08-19
 ---
 
@@ -16,7 +16,7 @@ date: 2026-08-19
 
 比特币走向更广大的人民群众之前，我们需要又安全又简单的托管方案。不是多签！不是wallet.dat!
 
-幸运的是，根据笔者给家人多年折腾不同自托管方案的经验，BIP39助记词+passphrase就是当前的版本答案，你不需要花太多时间不需要懂很多技术,就能构建既简单，同时安全性不亚于多重签名的托管方案（是的，不亚于！）。
+幸运的是，根据笔者给家人多年折腾不同自托管方案的经验，BIP39助记词+passphrase就是当前的版本答案，你不需要花太多时间不需要学很多技术,就能构建既简单同时安全性不亚于多重签名的托管方案（是的，不亚于！）。
 
 技术社区需要围绕BIP39助记词+passphrase路线开发工具创建文字视频攻略，才是让比特币走向广大群众的正路。
 

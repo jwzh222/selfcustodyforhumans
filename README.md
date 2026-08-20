@@ -65,7 +65,7 @@ npm run dev        # 本地预览 → http://localhost:4321
 
 ## 上线（Cloudflare Pages）
 
-1. 域名 **wecanselfcustody.com** 在 [Cloudflare Registrar](https://dash.cloudflare.com) 注册（约 $10.6/年），DNS 托管在 Cloudflare。
+1. 域名 **selfcustodyforhumans.com** 在 [Cloudflare Registrar](https://dash.cloudflare.com) 注册（约 $10.6/年），DNS 托管在 Cloudflare。
 2. 代码推到 GitHub 私有仓库。
 3. Cloudflare Pages 关联该仓库，构建配置：
    - 构建命令：`npm run build`
