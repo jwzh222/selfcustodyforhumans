@@ -1,0 +1,10 @@
+---
+// Roll Seeds 离线助记词生成器
+// 直接原样输出自包含 HTML（src/tools/roll-seeds.html），不套用站点布局/全局样式，
+// 使 /tools/roll-seeds 在 dev 与线上均为干净 URL 且功能完整。
+import { readFileSync } from 'node:fs';
+
+const toolHtml = readFileSync(process.cwd() + '/src/tools/roll-seeds.html', 'utf-8');
+const clean = toolHtml.replace(/^\s*<!DOCTYPE[^>]*>/i, '');
+---
+<Fragment set:html={clean} />
