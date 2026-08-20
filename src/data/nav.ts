@@ -21,6 +21,7 @@ export interface NavLeaf {
   id: string;
   label: string;
   mono?: boolean;
+  newTab?: boolean;                          // 新开标签页打开（如外部/工具类页面）
 }
 
 export interface NavGroup {
@@ -98,7 +99,7 @@ export const NAV: NavSection[] = [
     bordered: 'bottom',
     collapsible: false,
     children: [
-      { id: 'roll-seeds', label: 'Roll Seeds · 掷骰子生成助记词' },
+      { id: 'roll-seeds', label: 'Roll Seeds · 掷骰子生成助记词', newTab: true },
     ],
   },
 ];

@@ -104,7 +104,7 @@ const leafClasses = (mono: boolean, active: boolean) =>
                                     {sub2.children.map((leaf: NavLeaf) => {
                                       const leafRoute = `${section.id}/${group.id}/${sub2.id}/${leaf.id}`;
                                       return (
-                                        <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`}>
+                                        <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`} target={leaf.newTab ? '_blank' : undefined} rel={leaf.newTab ? 'noopener noreferrer' : undefined}>
                                           {leaf.label}
                                         </a>
                                       );
@@ -117,7 +117,7 @@ const leafClasses = (mono: boolean, active: boolean) =>
                             const leaf = child as NavLeaf;
                             const leafRoute = `${section.id}/${group.id}/${leaf.id}`;
                             return (
-                              <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`}>
+                              <a class={leafClasses(!!leaf.mono, route === leafRoute)} href={`/${leafRoute}`} target={leaf.newTab ? '_blank' : undefined} rel={leaf.newTab ? 'noopener noreferrer' : undefined}>
                                 {leaf.label}
                               </a>
                             );
@@ -131,6 +131,8 @@ const leafClasses = (mono: boolean, active: boolean) =>
                     <a
                       class={leafClasses(!!leaf.mono, route === `${section.id}/${leaf.id}`)}
                       href={`/${section.id}/${leaf.id}`}
+                      target={leaf.newTab ? '_blank' : undefined}
+                      rel={leaf.newTab ? 'noopener noreferrer' : undefined}
                     >
                       {leaf.label}
                     </a>
