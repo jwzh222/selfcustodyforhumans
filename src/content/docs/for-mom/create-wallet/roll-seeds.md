@@ -52,6 +52,8 @@ description: 十分钟你就能用最原始的方式生成宇宙最安全的高�
 
 ### 离线使用工具roll-seeds.html
 
+[打开 roll-seeds 离线工具 →](/tools/roll-seeds)
+
 
 
 

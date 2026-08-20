@@ -1,8 +1,42 @@
 ---
 // Roll Seeds 离线助记词生成器
-// 通过 Vite ?raw 在构建期把自包含 HTML 内联进来，不依赖 fs/cwd，Cloudflare 环境更稳。
-import toolHtml from '../../tools/roll-seeds.html?raw';
+// 构建期从 roll-seeds 的 GitHub 仓库拉取最新自包含 HTML，原样内联输出（仓库内不保留副本）。
+// 源优先级：jsDelivr CDN（国内可达）→ raw.githubusercontent.com（Cloudflare 构建可达、内容最新）。
+const SOURCES = [
+  'https://cdn.jsdelivr.net/gh/jwzh222/roll-seeds@main/roll-seeds.html',
+  'https://raw.githubusercontent.com/jwzh222/roll-seeds/main/roll-seeds.html',
+];
+
+let toolHtml = '';
+let lastErr: string | undefined;
+for (const url of SOURCES) {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (res.ok) {
+      toolHtml = await res.text();
+      break;
+    }
+    lastErr = `HTTP ${res.status} ${url}`;
+  } catch (e) {
+    lastErr = `${e}`;
+  }
+}
+if (!toolHtml) {
+  throw new Error(
+    `构建失败：无法从 roll-seeds 仓库拉取 roll-seeds.html（${lastErr}）。请检查网络与仓库可见性。`,
+  );
+}
+
+// 提取工具自身的标题/描述作为标签页标题与 SEO meta（页面不套站点布局，保持独立）。
+const title =
+  toolHtml.match(/<title>([^<]+)<\/title>/)?.[1] ??
+  'Roll Seeds · BIP39 Mnemonic Generator (Offline)';
+const desc =
+  toolHtml.match(/<meta name="description" content="([^"]+)"/)?.[1] ??
+  'Generate a secure BIP39 mnemonic from physical dice or coin flips, fully offline.';
 
 const clean = toolHtml.replace(/^\s*<!DOCTYPE[^>]*>/i, '');
 ---
+<title>{title}</title>
+<meta name="description" content={desc} />
 <Fragment set:html={clean} />

@@ -46,3 +46,5 @@ draft: false
 
 
 ### 离线使用工具roll-seeds.html
+
+[打开 roll-seeds 离线工具 →](/tools/roll-seeds)
