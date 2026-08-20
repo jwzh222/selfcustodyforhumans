@@ -86,21 +86,9 @@ export const NAV: NavSection[] = [
   },
   {
     id: 'advanced',
-    label: 'for 高级用户',
+    label: 'blog',
     bordered: true,
     collapsible: false,
-  },
-  {
-    id: 'appendix',
-    label: '附录',
-    icon: '/assets/appendix-icon.svg',
-    bordered: 'bottom',
-    indented: true,
-    collapsible: true,
-    children: [
-      { id: 'abc', label: '1. abc' },
-      { id: 'cdb', label: '2. cdb' },
-    ],
   },
   {
     id: 'tools',
@@ -108,8 +96,10 @@ export const NAV: NavSection[] = [
     icon: '/assets/tools-icon.svg',
     iconClass: 'tools',
     bordered: 'bottom',
-    indented: true,
     collapsible: false,
+    children: [
+      { id: 'roll-seeds', label: 'Roll Seeds · 掷骰子生成助记词' },
+    ],
   },
 ];
 
